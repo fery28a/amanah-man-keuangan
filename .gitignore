@@ -1,0 +1,12 @@
+# Node.js
+node_modules
+*.env
+package-lock.json
+
+# Vite/Frontend
+amanah-keuangan/dist/
+amanah-keuangan/node_modules/
+
+# Backend
+amanah-keuangan-backend/node_modules/
+
