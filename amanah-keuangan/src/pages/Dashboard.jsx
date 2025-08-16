@@ -3,8 +3,8 @@ import axios from 'axios';
 import DataKeuanganContext from '../context/DataKeuanganContext';
 
 const API_URLS = {
-  hutang: 'http://localhost:5019/api/hutang',
-  piutang: 'http://localhost:5019/api/piutang',
+  hutang: '/api/hutang',
+  piutang: '/api/piutang',
 };
 
 const Dashboard = () => {
