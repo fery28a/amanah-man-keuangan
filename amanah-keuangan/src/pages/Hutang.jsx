@@ -9,8 +9,7 @@ import {
   TrashIcon,
 } from '@heroicons/react/24/outline';
 
-const API_URL = 'http://localhost:5019/api/hutang';
-
+const API_URL = '/api/hutang';
 const Hutang = () => {
   const { hutangData, setHutangData } = useContext(DataKeuanganContext);
   
