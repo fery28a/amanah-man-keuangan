@@ -3,7 +3,7 @@ import axios from 'axios';
 import DataKeuanganContext from '../context/DataKeuanganContext';
 import { PencilIcon, CheckIcon, XMarkIcon, ShoppingBagIcon, TrashIcon } from '@heroicons/react/24/outline';
 
-const API_URL = 'http://localhost:5019/api/piutang';
+const API_URL = '/api/piutang';
 
 const Piutang = () => {
   const { piutangData, setPiutangData } = useContext(DataKeuanganContext);
