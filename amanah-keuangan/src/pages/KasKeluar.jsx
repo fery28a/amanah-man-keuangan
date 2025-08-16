@@ -3,8 +3,7 @@ import axios from 'axios';
 import DataKeuanganContext from '../context/DataKeuanganContext';
 import { PencilIcon, CheckIcon, XMarkIcon, TrashIcon } from '@heroicons/react/24/outline';
 
-const API_URL = 'http://localhost:5019/api/kaskeluar';
-
+const API_URL = '/api/kaskeluar';
 const KasKeluar = () => {
   const { kasKeluarData, setKasKeluarData } = useContext(DataKeuanganContext);
   const [deskripsi, setDeskripsi] = useState('');
