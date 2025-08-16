@@ -5,11 +5,11 @@ import DataKeuanganContext from '../context/DataKeuanganContext';
 import { ArrowDownTrayIcon } from '@heroicons/react/24/outline';
 
 const API_URLS = {
-  kasMasuk: 'http://localhost:5019/api/kasmasuk',
-  kasKeluar: 'http://localhost:5019/api/kaskeluar',
-  hutang: 'http://localhost:5019/api/hutang',
-  piutang: 'http://localhost:5019/api/piutang',
-  itemKeluar: 'http://localhost:5019/api/itemkeluar',
+  kasMasuk: '/api/kasmasuk',
+  kasKeluar: '/api/kaskeluar',
+  hutang: '/api/hutang',
+  piutang: '/api/piutang',
+  itemKeluar: '/api/itemkeluar',
 };
 
 const Laporan = () => {
