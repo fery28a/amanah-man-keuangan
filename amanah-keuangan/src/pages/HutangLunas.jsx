@@ -2,7 +2,7 @@ import React, { useState, useContext, useEffect } from 'react';
 import axios from 'axios';
 import DataKeuanganContext from '../context/DataKeuanganContext';
 
-const API_URL = 'http://localhost:5019/api/hutang/lunas';
+const API_URL = '/api/hutang/lunas';
 
 const HutangLunas = () => {
   const { hutangLunasData, setHutangLunasData } = useContext(DataKeuanganContext);
