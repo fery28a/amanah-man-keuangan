@@ -1,11 +1,28 @@
 // src/controllers/hutangController.js
 const Hutang = require('../models/Hutang');
 
-// @desc    Get all hutang
+// @desc    Get all unpaid hutang
 // @route   GET /api/hutang
 exports.getHutang = async (req, res) => {
   try {
-    const hutang = await Hutang.find();
+    const hutang = await Hutang.find({ statusPembayaran: 'Belum Lunas' });
+    res.status(200).json({
+      success: true,
+      data: hutang,
+    });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      error: 'Server Error',
+    });
+  }
+};
+
+// @desc    Get all paid hutang
+// @route   GET /api/hutang/lunas
+exports.getHutangLunas = async (req, res) => {
+  try {
+    const hutang = await Hutang.find({ statusPembayaran: 'Lunas' });
     res.status(200).json({
       success: true,
       data: hutang,

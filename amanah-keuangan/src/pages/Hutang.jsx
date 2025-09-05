@@ -55,7 +55,6 @@ const Hutang = () => {
       tanggalJatuhTempo,
       nominal: parseFloat(nominal),
       namaSuplier,
-      // Saat tambah baru, sisaHutang sama dengan nominal
       sisaHutang: parseFloat(nominal),
       statusPembayaran: 'Belum Lunas',
       statusInput: false
@@ -63,7 +62,6 @@ const Hutang = () => {
 
     try {
       if (editingHutangId) {
-        // Logika PUT: Kirim nominal dan sisaHutang
         await axios.put(`${API_URL}/${editingHutangId}`, { ...newHutang, sisaHutang: parseFloat(nominal) });
         setEditingHutangId(null);
       } else {
@@ -139,7 +137,7 @@ const Hutang = () => {
 
   const filteredHutang = hutangData.filter(item => {
     const itemDate = new Date(item.tanggalJatuhTempo);
-    return itemDate.getMonth() + 1 === parseInt(selectedMonth) && itemDate.getFullYear() === parseInt(selectedYear);
+    return itemDate.getMonth() + 1 === parseInt(selectedMonth) && itemDate.getFullYear() === parseInt(selectedYear) && item.statusPembayaran !== 'Lunas';
   });
 
   return (

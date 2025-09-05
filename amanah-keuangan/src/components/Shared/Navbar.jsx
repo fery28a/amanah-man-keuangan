@@ -9,6 +9,7 @@ const Navbar = () => {
     { path: '/kas-masuk', label: 'Kas Masuk' },
     { path: '/kas-keluar', label: 'Kas Keluar' },
     { path: '/hutang', label: 'Hutang' },
+    { path: '/hutang-lunas', label: 'Hutang Lunas' },
     { path: '/piutang', label: 'Piutang' },
     { path: '/item-keluar', label: 'Item Keluar' },
     { path: '/laporan', label: 'Laporan' },

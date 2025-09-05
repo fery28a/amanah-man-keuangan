@@ -8,6 +8,7 @@ import Hutang from './pages/Hutang';
 import Piutang from './pages/Piutang';
 import ItemKeluar from './pages/ItemKeluar';
 import Laporan from './pages/Laporan';
+import HutangLunas from './pages/HutangLunas';
 
 const router = createBrowserRouter([
   {
@@ -29,6 +30,10 @@ const router = createBrowserRouter([
       {
         path: 'hutang',
         element: <Hutang />,
+      },
+      {
+        path: 'hutang-lunas',
+        element: <HutangLunas />,
       },
       {
         path: 'piutang',
