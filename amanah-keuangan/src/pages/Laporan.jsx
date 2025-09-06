@@ -11,6 +11,7 @@ const API_URLS = {
   hutang: '/api/hutang',
   hutangLunas: '/api/hutang/lunas',
   piutang: '/api/piutang',
+  piutangLunas: '/api/piutang/lunas',
   itemKeluar: '/api/itemkeluar',
 };
 
@@ -22,6 +23,7 @@ const Laporan = () => {
     hutangData, setHutangData,
     hutangLunasData, setHutangLunasData,
     piutangData, setPiutangData,
+    piutangLunasData, setPiutangLunasData,
     itemKeluarData, setItemKeluarData
   } = useContext(DataKeuanganContext);
   
@@ -40,12 +42,13 @@ const Laporan = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [kasMasukRes, kasKeluarRes, hutangRes, hutangLunasRes, piutangRes, itemKeluarRes] = await Promise.all([
+        const [kasMasukRes, kasKeluarRes, hutangRes, hutangLunasRes, piutangRes, piutangLunasRes, itemKeluarRes] = await Promise.all([
           axios.get(API_URLS.kasMasuk),
           axios.get(API_URLS.kasKeluar),
           axios.get(API_URLS.hutang),
           axios.get(API_URLS.hutangLunas),
           axios.get(API_URLS.piutang),
+          axios.get(API_URLS.piutangLunas),
           axios.get(API_URLS.itemKeluar),
         ]);
         
@@ -54,13 +57,14 @@ const Laporan = () => {
         setHutangData(hutangRes.data.data);
         setHutangLunasData(hutangLunasRes.data.data);
         setPiutangData(piutangRes.data.data);
+        setPiutangLunasData(piutangLunasRes.data.data);
         setItemKeluarData(itemKeluarRes.data.data);
       } catch (err) {
         console.error('Error fetching laporan data:', err);
       }
     };
     fetchData();
-  }, [setKasMasukData, setKasKeluarData, setHutangData, setHutangLunasData, setPiutangData, setItemKeluarData]);
+  }, [setKasMasukData, setKasKeluarData, setHutangData, setHutangLunasData, setPiutangData, setPiutangLunasData, setItemKeluarData]);
 
   // Fungsi untuk memfilter data berdasarkan bulan dan tahun yang dipilih
   const getFilteredData = () => {
@@ -70,13 +74,19 @@ const Laporan = () => {
       hutang: hutangData,
       hutangLunas: hutangLunasData,
       piutang: piutangData,
+      piutangLunas: piutangLunasData,
       itemKeluar: itemKeluarData,
     };
     
-    return dataMap[selectedReport]?.filter(item => {
+    // Pastikan data ada sebelum memfilter
+    if (!dataMap[selectedReport] || !Array.isArray(dataMap[selectedReport])) {
+        return [];
+    }
+
+    return dataMap[selectedReport].filter(item => {
       const itemDate = new Date(item.tanggal || item.tanggalJatuhTempo);
       return itemDate.getMonth() + 1 === parseInt(selectedMonth) && itemDate.getFullYear() === parseInt(selectedYear);
-    }) || [];
+    });
   };
 
   // Modul untuk mengekspor data ke Excel
@@ -109,6 +119,23 @@ const Laporan = () => {
             'Nominal': item.nominal,
             'Status Pembayaran': item.statusPembayaran,
           };
+        case 'piutang':
+          return {
+            'Deskripsi': item.deskripsi,
+            'Nama Kustomer': item.namaKustomer,
+            'Jatuh Tempo': new Date(item.tanggalJatuhTempo).toLocaleDateString(),
+            'Nominal': item.nominal,
+            'Sisa Piutang': item.sisaPiutang,
+            'Status Pembayaran': item.statusPembayaran,
+          };
+        case 'piutangLunas':
+          return {
+            'Deskripsi': item.deskripsi,
+            'Nama Kustomer': item.namaKustomer,
+            'Tanggal Lunas': new Date(item.updatedAt).toLocaleDateString(),
+            'Nominal': item.nominal,
+            'Status Pembayaran': item.statusPembayaran,
+          };
         case 'itemKeluar':
           return {
             'Tanggal': new Date(item.tanggal).toLocaleDateString(),
@@ -137,6 +164,8 @@ const Laporan = () => {
       kasKeluar: ['No', 'Tanggal', 'Deskripsi', 'Nominal'],
       hutang: ['No', 'Nama Suplier', 'No. Transaksi', 'Jatuh Tempo', 'Nominal', 'Sisa Hutang', 'Status Pembayaran'],
       hutangLunas: ['No', 'Nama Suplier', 'No. Transaksi', 'Tanggal Lunas', 'Nominal', 'Status Pembayaran'],
+      piutang: ['No', 'Nama Kustomer', 'Jatuh Tempo', 'Nominal', 'Sisa Piutang', 'Status Pembayaran'],
+      piutangLunas: ['No', 'Nama Kustomer', 'Tanggal Lunas', 'Nominal', 'Status Pembayaran'],
       itemKeluar: ['No', 'Tanggal', 'Nama Item', 'Deskripsi', 'Jumlah', 'Satuan'],
     };
     
@@ -194,6 +223,31 @@ const Laporan = () => {
                   <>
                     <td className="px-6 py-4 text-sm text-gray-500">{item.namaSuplier}</td>
                     <td className="px-6 py-4 text-sm text-gray-500">{item.noTransaksi}</td>
+                    <td className="px-6 py-4 text-sm text-gray-500">{new Date(item.updatedAt).toLocaleDateString()}</td>
+                    <td className="px-6 py-4 text-sm text-gray-500">Rp{item.nominal.toLocaleString('id-ID')}</td>
+                    <td className="px-6 py-4 text-sm">
+                      <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-200 text-green-800">
+                        {item.statusPembayaran}
+                      </span>
+                    </td>
+                  </>
+                )}
+                {selectedReport === 'piutang' && (
+                  <>
+                    <td className="px-6 py-4 text-sm text-gray-500">{item.namaKustomer}</td>
+                    <td className="px-6 py-4 text-sm text-gray-500">{new Date(item.tanggalJatuhTempo).toLocaleDateString()}</td>
+                    <td className="px-6 py-4 text-sm text-gray-500">Rp{item.nominal.toLocaleString('id-ID')}</td>
+                    <td className="px-6 py-4 text-sm font-semibold text-green-500">Rp{item.sisaPiutang.toLocaleString('id-ID')}</td>
+                    <td className="px-6 py-4 text-sm">
+                      <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-200 text-red-800">
+                        {item.statusPembayaran}
+                      </span>
+                    </td>
+                  </>
+                )}
+                {selectedReport === 'piutangLunas' && (
+                  <>
+                    <td className="px-6 py-4 text-sm text-gray-500">{item.namaKustomer}</td>
                     <td className="px-6 py-4 text-sm text-gray-500">{new Date(item.updatedAt).toLocaleDateString()}</td>
                     <td className="px-6 py-4 text-sm text-gray-500">Rp{item.nominal.toLocaleString('id-ID')}</td>
                     <td className="px-6 py-4 text-sm">
@@ -299,6 +353,8 @@ const Laporan = () => {
           <button onClick={() => setSelectedReport('kasKeluar')} className={`px-4 py-2 rounded-md font-semibold transition-colors duration-200 ${selectedReport === 'kasKeluar' ? 'bg-indigo-600 text-white' : 'bg-gray-200 text-gray-800 hover:bg-gray-300'}`}>Kas Keluar</button>
           <button onClick={() => setSelectedReport('hutang')} className={`px-4 py-2 rounded-md font-semibold transition-colors duration-200 ${selectedReport === 'hutang' ? 'bg-indigo-600 text-white' : 'bg-gray-200 text-gray-800 hover:bg-gray-300'}`}>Hutang</button>
           <button onClick={() => setSelectedReport('hutangLunas')} className={`px-4 py-2 rounded-md font-semibold transition-colors duration-200 ${selectedReport === 'hutangLunas' ? 'bg-indigo-600 text-white' : 'bg-gray-200 text-gray-800 hover:bg-gray-300'}`}>Hutang Lunas</button>
+          <button onClick={() => setSelectedReport('piutang')} className={`px-4 py-2 rounded-md font-semibold transition-colors duration-200 ${selectedReport === 'piutang' ? 'bg-indigo-600 text-white' : 'bg-gray-200 text-gray-800 hover:bg-gray-300'}`}>Piutang</button>
+          <button onClick={() => setSelectedReport('piutangLunas')} className={`px-4 py-2 rounded-md font-semibold transition-colors duration-200 ${selectedReport === 'piutangLunas' ? 'bg-indigo-600 text-white' : 'bg-gray-200 text-gray-800 hover:bg-gray-300'}`}>Piutang Lunas</button>
           <button onClick={() => setSelectedReport('itemKeluar')} className={`px-4 py-2 rounded-md font-semibold transition-colors duration-200 ${selectedReport === 'itemKeluar' ? 'bg-indigo-600 text-white' : 'bg-gray-200 text-gray-800 hover:bg-gray-300'}`}>Item Keluar</button>
         </div>
       </div>
