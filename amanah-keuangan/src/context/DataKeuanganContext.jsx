@@ -8,6 +8,7 @@ export const DataKeuanganProvider = ({ children }) => {
   const [kasMasukData, setKasMasukData] = useState([]);
   const [kasKeluarData, setKasKeluarData] = useState([]);
   const [piutangData, setPiutangData] = useState([]);
+  const [piutangLunasData, setPiutangLunasData] = useState([]);
   const [itemKeluarData, setItemKeluarData] = useState([]);
 
   const value = {
@@ -16,6 +17,7 @@ export const DataKeuanganProvider = ({ children }) => {
     kasMasukData, setKasMasukData,
     kasKeluarData, setKasKeluarData,
     piutangData, setPiutangData,
+    piutangLunasData, setPiutangLunasData,
     itemKeluarData, setItemKeluarData,
   };
 
