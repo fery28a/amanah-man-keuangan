@@ -1,4 +1,3 @@
-// src/components/Shared/Navbar.jsx
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 
@@ -11,6 +10,7 @@ const Navbar = () => {
     { path: '/hutang', label: 'Hutang' },
     { path: '/hutang-lunas', label: 'Hutang Lunas' },
     { path: '/piutang', label: 'Piutang' },
+    { path: '/piutang-lunas', label: 'Piutang Lunas' },
     { path: '/item-keluar', label: 'Item Keluar' },
     { path: '/laporan', label: 'Laporan' },
   ];
