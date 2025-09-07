@@ -10,18 +10,23 @@ import {
 } from '@heroicons/react/24/outline';
 
 const API_URL = '/api/hutang';
+
 const Hutang = () => {
   const { hutangData, setHutangData } = useContext(DataKeuanganContext);
   
+  // State untuk form input
   const [deskripsi, setDeskripsi] = useState('');
   const [noTransaksi, setNoTransaksi] = useState('');
   const [tanggalJatuhTempo, setTanggalJatuhTempo] = useState('');
   const [nominal, setNominal] = useState('');
   const [namaSuplier, setNamaSuplier] = useState('');
 
+  // State untuk filter
   const today = new Date();
   const [selectedMonth, setSelectedMonth] = useState(today.getMonth() + 1);
   const [selectedYear, setSelectedYear] = useState(today.getFullYear());
+  const [suppliers, setSuppliers] = useState([]);
+  const [selectedSupplier, setSelectedSupplier] = useState(''); // State baru untuk suplier terpilih
 
   const monthNames = [
     'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
@@ -29,6 +34,7 @@ const Hutang = () => {
   ];
   const years = Array.from({ length: 5 }, (_, i) => today.getFullYear() - 2 + i);
 
+  // State untuk modal dan editing
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedHutangId, setSelectedHutangId] = useState(null);
   const [paymentAmount, setPaymentAmount] = useState('');
@@ -46,6 +52,14 @@ const Hutang = () => {
   useEffect(() => {
     fetchHutangData();
   }, [setHutangData]);
+  
+  // useEffect baru untuk membuat daftar suplier unik
+  useEffect(() => {
+    if (hutangData && Array.isArray(hutangData)) {
+      const uniqueSuppliers = [...new Set(hutangData.map(item => item.namaSuplier))];
+      setSuppliers(uniqueSuppliers.sort());
+    }
+  }, [hutangData]);
 
   const handleAddHutang = async (e) => {
     e.preventDefault();
@@ -135,46 +149,80 @@ const Hutang = () => {
     }
   };
 
-  const filteredHutang = hutangData.filter(item => {
-    const itemDate = new Date(item.tanggalJatuhTempo);
-    return itemDate.getMonth() + 1 === parseInt(selectedMonth) && itemDate.getFullYear() === parseInt(selectedYear) && item.statusPembayaran !== 'Lunas';
-  });
+  // Logika filter diperbarui untuk menyertakan filter suplier
+  const filteredHutang = hutangData
+    .filter(item => {
+        // Filter berdasarkan suplier jika dipilih
+        if (selectedSupplier) {
+            return item.namaSuplier === selectedSupplier;
+        }
+        return true;
+    })
+    .filter(item => {
+        // Filter berdasarkan bulan dan tahun, hanya jika tidak ada suplier yang dipilih
+        if (!selectedSupplier) {
+            const itemDate = new Date(item.tanggalJatuhTempo);
+            return itemDate.getMonth() + 1 === parseInt(selectedMonth) && itemDate.getFullYear() === parseInt(selectedYear);
+        }
+        return true;
+    });
 
   return (
     <div className="p-6">
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex justify-between items-center mb-6 flex-wrap gap-4">
         <h1 className="text-3xl font-bold text-gray-800">Hutang</h1>
-        <div className="flex space-x-4">
+        {/* Kolom filter baru */}
+        <div className="flex space-x-2">
           <div>
-            <label htmlFor="month" className="sr-only">Bulan</label>
+            <label htmlFor="supplier" className="sr-only">Suplier</label>
             <select
-              id="month"
-              value={selectedMonth}
-              onChange={(e) => setSelectedMonth(e.target.value)}
+              id="supplier"
+              value={selectedSupplier}
+              onChange={(e) => setSelectedSupplier(e.target.value)}
               className="mt-1 block rounded-md border-gray-300 shadow-sm sm:text-sm p-2"
             >
-              {monthNames.map((name, index) => (
-                <option key={index + 1} value={index + 1}>{name}</option>
+              <option value="">Semua Suplier</option>
+              {suppliers.map((supplier) => (
+                <option key={supplier} value={supplier}>{supplier}</option>
               ))}
             </select>
           </div>
-          <div>
-            <label htmlFor="year" className="sr-only">Tahun</label>
-            <select
-              id="year"
-              value={selectedYear}
-              onChange={(e) => setSelectedYear(e.target.value)}
-              className="mt-1 block rounded-md border-gray-300 shadow-sm sm:text-sm p-2"
-            >
-              {years.map(year => (
-                <option key={year} value={year}>{year}</option>
-              ))}
-            </select>
-          </div>
+          {/* Filter bulan dan tahun disembunyikan jika suplier dipilih */}
+          {!selectedSupplier && (
+            <>
+              <div>
+                <label htmlFor="month" className="sr-only">Bulan</label>
+                <select
+                  id="month"
+                  value={selectedMonth}
+                  onChange={(e) => setSelectedMonth(e.target.value)}
+                  className="mt-1 block rounded-md border-gray-300 shadow-sm sm:text-sm p-2"
+                >
+                  {monthNames.map((name, index) => (
+                    <option key={index + 1} value={index + 1}>{name}</option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label htmlFor="year" className="sr-only">Tahun</label>
+                <select
+                  id="year"
+                  value={selectedYear}
+                  onChange={(e) => setSelectedYear(e.target.value)}
+                  className="mt-1 block rounded-md border-gray-300 shadow-sm sm:text-sm p-2"
+                >
+                  {years.map(year => (
+                    <option key={year} value={year}>{year}</option>
+                  ))}
+                </select>
+              </div>
+            </>
+          )}
         </div>
       </div>
       
       <form onSubmit={handleAddHutang} className="bg-white p-6 rounded-lg shadow-md mb-8">
+        {/* ... Form input tidak berubah ... */}
         <div className="grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
           <div>
             <label htmlFor="deskripsi" className="block text-sm font-medium text-gray-700">
@@ -256,8 +304,9 @@ const Hutang = () => {
 
       <div className="bg-white p-6 rounded-lg shadow-md">
         <h2 className="text-xl font-semibold text-gray-700 mb-4">Daftar Hutang</h2>
+        {/* ... Tabel dan isinya tidak berubah ... */}
         {filteredHutang.length === 0 ? (
-          <p className="text-gray-500">Tidak ada data hutang untuk bulan ini.</p>
+          <p className="text-gray-500">Tidak ada data hutang yang sesuai dengan filter.</p>
         ) : (
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200 table-auto">
@@ -287,9 +336,7 @@ const Hutang = () => {
                     <td className="px-6 py-4 text-sm font-semibold text-red-500">Rp{item.sisaHutang.toLocaleString('id-ID')}</td>
                     <td className="px-6 py-4 text-sm">
                       <span
-                        className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                          item.statusPembayaran === 'Lunas' ? 'bg-green-200 text-green-800' : 'bg-red-200 text-red-800'
-                        }`}
+                        className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-200 text-red-800`}
                       >
                         {item.statusPembayaran}
                       </span>
@@ -345,6 +392,7 @@ const Hutang = () => {
         )}
       </div>
 
+      {/* ... Modal pembayaran tidak berubah ... */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex justify-center items-center">
           <div className="bg-white p-8 rounded-lg shadow-xl w-96">
