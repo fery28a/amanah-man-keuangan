@@ -1,4 +1,3 @@
-// src/models/Piutang.js
 const mongoose = require('mongoose');
 
 const PiutangSchema = new mongoose.Schema({
@@ -9,6 +8,10 @@ const PiutangSchema = new mongoose.Schema({
   namaKustomer: {
     type: String,
     required: true,
+  },
+  tanggal: {
+    type: Date,
+    default: Date.now, // PERUBAHAN: Tanggal akan diisi otomatis
   },
   tanggalJatuhTempo: {
     type: Date,
