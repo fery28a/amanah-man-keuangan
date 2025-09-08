@@ -1,4 +1,3 @@
-// src/models/Hutang.js
 const mongoose = require('mongoose');
 
 const HutangSchema = new mongoose.Schema({
@@ -13,6 +12,10 @@ const HutangSchema = new mongoose.Schema({
   noTransaksi: {
     type: String,
     required: true,
+  },
+  tanggal: {
+    type: Date,
+    default: Date.now, // PERUBAHAN: Tanggal akan diisi otomatis
   },
   tanggalJatuhTempo: {
     type: Date,
